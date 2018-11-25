@@ -34,6 +34,28 @@ TiDB
          开发，极大的提升研发的生产力。
 </pre>
 
+![](https://i.imgur.com/HuroPK3.png)
+
 <pre>
 TiDB的整体架构
+
+    TiDB集群主要分为三个组件：
+        1）TiDB Server
+           TiDB Server负责接收SQL请求，处理SQL相关的逻辑，并通过PD找到存储计算所需数据的
+         TiKV地址，与TiKV交互获取数据，最终返回结果。TiDB Server是无状态的，其本身并不存
+         储数据，值负责计算，可以无限水平扩展，可以通过负载均衡组件（LVS, HAProxy, F5）
+         对外提供统一的接入地址。
+
+    PD Server
+         Placement Driver是整个集群的管理模块，其主要工作有三个
+             1：存储集群的元信息（某个Key存储在哪个TiKV节点）
+             2：对TiKV集群进行调度和负载均衡（如数据的迁移， Raft group leader的迁移）
+             3：分配全局唯一且递增的事务ID
+         PD是一个集群，需要部署奇数个节点，一半线上推荐至少3个节点。
+
+    TiKV Server
+         TiKV Server负责存储数据，从外部看TiKV是一个分布式的提供事务的Key-Value存储引擎
+      。存储数据的基本单位是Region，每个Region负责存储一个Key Range（从StartKey
+      到EndKey的左闭右开区间）的数据，每个TiKV节点负责多个Region。TiKV使用Raft协议做复制
+      ，保持数据的一致性和容灾。副本以Region
 </pre>
